@@ -725,7 +725,7 @@ nominalRfeWorkflow <- function(x, y, sizes, ppOpts, ctrl, lev, ...)
 
   externPerf <- plyr::ddply(resamples[,!grepl("\\.cell|Resample", colnames(resamples)),drop = FALSE],
                       .(Variables),
-                      MeanSD,
+                      if (!exists("summarySD", ctrl$functions)) MeanSD else ctrl$functions$summarySD,
                       exclude = "Variables")
   if(ctrl$method %in% c("boot632"))
   {

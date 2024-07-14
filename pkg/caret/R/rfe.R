@@ -497,17 +497,25 @@ rfeIter <- function(x, y,
       warning(msg1, call. = FALSE)
       modImp <- repair_rank(modImp, colnames(x))
     }
+
     if(any(!complete.cases(modImp))){
       warning(paste("There were missing importance values.",
                  "There may be linear dependencies in your predictor variables"),
               call. = FALSE)
     }
+
     if (!any(names(modImp) == "var")) {
       stop("The importance score data should include a column named `var`.")
     }
-    finalVariables[[k]] <- subset(modImp, var %in% retained)
-    finalVariables[[k]]$Variables <- sizeValues[[k]]
-    if(k < length(sizeValues)) retained <- as.character(modImp$var)[1:sizeValues[k+1]]
+
+    if (sizeValues[[k]] > 0L) {
+      finalVariables[[k]] <- subset(modImp, var %in% retained)
+      finalVariables[[k]]$Variables <- sizeValues[[k]]
+    } else finalVariables[[k]] <- data.frame(Overall = numeric(), var = character(),
+                                             Variables = integer(), stringsAsFactors = FALSE)
+
+    if (k < length(sizeValues)) # In case 0 features, return empty set.
+      retained <- if (sizeValues[k + 1] >= 1) as.character(modImp$var)[1:sizeValues[k + 1]] else character()
   }
   list(finalVariables = finalVariables, pred = rfePred)
 
